@@ -1,0 +1,31 @@
+
+# Structure
+version: "3.9"   # file version 
+
+services: # list of the service
+  postgres: # name of the service can be anything
+    image: postgres:15   # which Docker image to use from Docker Hub
+    
+    container_name: my-postgres  # set container name
+    
+    ports:
+      - "5432:5432" # HOST:CONTAINER, tell Docker that the container port for this service is host on this host port
+    
+    environment: # contain enviroment variables
+      POSTGRES_USER: root 
+      POSTGRES_PASSWORD: 1234   
+      POSTGRES_DB: database    
+
+    volumes: # store the data from postgres_data(inside container) to this path ./ so that data wont be lost
+      - postgres_data:/var/lib/postgresql/data  
+
+    restart: unless-stopped  # rule, tell Docker what to do if the container failed, manual stop, etc     
+    # Restart policy:
+    # - "no"        = never restart
+    # - "always"    = restart even if manually stopped
+    # - "on-failure"= restart only if exit code != 0
+    # - "unless-stopped" = restart unless *you* stopped it
+
+# Declare volume for Docker to create 
+volumes:
+  postgres_data:
