@@ -20,8 +20,6 @@ export class DbService {
       .then(() => console.log('Connected to Postgres'))
       .catch(err => console.error('Failed to connect', err));
   }
-
-
   async query(data: string, params?: any[]) {
     // Directly run to get all data from table so dont have to connect it again
     return this.client.query(data, params);

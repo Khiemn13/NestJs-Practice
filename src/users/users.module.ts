@@ -1,13 +1,17 @@
-// Groups all "user" related features. Declares controller, service, and entities.
-
-
 import { Module } from '@nestjs/common';           // import Module decorator from NestJS
 import { UserService } from './users.service';     // import your service
 import { UserController } from './users.controller'; // import your controller
-import { DbService } from '../db.service';         // import your DbService (one folder up)
+import { MeController } from './me.controller'; // import MeController
 
-@Module({                                        // define a NestJS module
-  controllers: [UserController],                // controllers this module provides
-  providers: [UserService, DbService],          // services this module provides
+
+import { TypeOrmModule } from '@nestjs/typeorm';    // needed for TypeORM repository injection
+import { User } from './users.entity';              // "user" TypeORM entity
+
+@Module({                                        
+  imports: [TypeOrmModule.forFeature([User])],    // registers User repository
+  controllers: [UserController, MeController],                
+  providers: [UserService],                      
+  exports: [UserService], 
+
 })
 export class UserModule {}                       // export the module

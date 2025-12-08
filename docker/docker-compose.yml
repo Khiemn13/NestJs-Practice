@@ -1,4 +1,3 @@
-
 # Structure
 version: "3.9"   # file version 
 
@@ -27,5 +26,5 @@ services: # list of the service
     # - "unless-stopped" = restart unless *you* stopped it
 
 # Declare volume for Docker to create 
-volumes:
+volumes: 
   postgres_data:
