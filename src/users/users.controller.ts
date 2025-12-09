@@ -3,7 +3,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { UserService } from './users.service';     
 import { User } from './users.entity';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto } from './dto/user_create.dto';
 
 
 @Controller('users')  //Sets the base URL path for all routes inside this controller.                                      

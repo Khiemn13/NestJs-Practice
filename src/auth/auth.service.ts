@@ -1,9 +1,9 @@
-// src/auth/auth.service.ts
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../users/users.service'; // your existing service
 import { User } from '../users/users.entity';
+import { CreateUserDto } from '../users/dto/user_create.dto';  
 
 @Injectable()
 export class AuthService {
@@ -44,4 +44,21 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+
+  async register(dto: CreateUserDto) {
+  // 1. Check if email already exists
+  const existing = await this.usersService.findByEmail(dto.gmail);
+  if (existing) {
+    throw new ConflictException('Email already exists');
+  }
+
+  // 2. Create user (password will be hashed by @BeforeInsert in entity)
+  const user = await this.usersService.create(dto);
+
+  // 3. Remove password from return object
+  const { password, ...safeUser } = user;
+
+  return safeUser;
+}
+
 }
