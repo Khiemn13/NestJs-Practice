@@ -5,14 +5,14 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: 'secretKey', // must match AuthModule secret
+    super({ // The super() function call configures HOW Passport should find and verify JWT tokens.
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // tells Passport WHERE to look for the JWT token Authorization: Bearer <token>
+      ignoreExpiration: false, // ignore expired token
+      secretOrKey: 'secretKey', // key to to verify JWT 
     });
   }
-
+  // wait and run after the the JWT is verified.  
   async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+    return { username: payload.username };
   }
 }

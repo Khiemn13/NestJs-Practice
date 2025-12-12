@@ -1,3 +1,4 @@
+// Logic, validate user, generate token, register
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -12,9 +13,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  /**
-   * 1. Validate login credentials (gmail + password)
-   * Returns user WITHOUT password if valid, or null if invalid.
+  /*
+    1. Validate login credentials (gmail + password)
+     Returns user WITHOUT password if valid, or null if invalid.
    */
   async validateUser(
     gmail: string,
@@ -33,9 +34,9 @@ export class AuthService {
     return result;
   }
 
-  /**
-   * 2. Generate a JWT token for a user
-   */
+  /*
+   2. Generate a JWT token for a user
+  */
   async login(user: any) {
     // Payload that will be encoded into the JWT
     const payload = { username: user.gmail, sub: user.id };
@@ -45,6 +46,9 @@ export class AuthService {
     };
   }
 
+  /*
+   3. Create user
+  */
   async register(dto: CreateUserDto) {
   // 1. Check if email already exists
   const existing = await this.usersService.findByEmail(dto.gmail);
