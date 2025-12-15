@@ -1,5 +1,5 @@
 // Logic, validate user, generate token, register
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../users/users.service'; // your existing service
@@ -37,14 +37,27 @@ export class AuthService {
   /*
    2. Generate a JWT token for a user
   */
-  async login(user: any) {
-    // Payload that will be encoded into the JWT
-    const payload = { username: user.gmail, sub: user.id };
+  async login(gmail: string, password: string) {
+    const user = await this.usersService.findByEmail(gmail);
+    if (!user) throw new UnauthorizedException();
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) throw new UnauthorizedException();
+
+    const { accessToken, refreshToken } = await this.getTokens(user);
+
+    await this.saveRefreshToken(user.id, refreshToken);
 
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        gmail: user.gmail,
+      },
     };
   }
+
 
   /*
    3. Create user
@@ -63,6 +76,57 @@ export class AuthService {
   const { password, ...safeUser } = user;
 
   return safeUser;
+}
+
+  // 4. Generate Tokens, refresh and access
+  private async getTokens(user: User) {
+    const payload = { // payload here
+      sub: user.id,
+      gmail: user.gmail,
+    };
+
+    // signAsync(payload, options): Build the JWT Token
+    const accessToken = await this.jwtService.signAsync(payload, { 
+      expiresIn: '15m',
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+      expiresIn: '7d',
+    });
+
+    return { accessToken, refreshToken };
+  }
+
+  private async saveRefreshToken(userId: number, refreshToken: string) {
+  const hash = await bcrypt.hash(refreshToken, 10);
+  await this.usersService.update(userId, { refreshTokenHash: hash });
+}
+
+async refreshTokens(userId: number, refreshToken: string) {
+  const user = await this.usersService.findById(userId);
+  if (!user || !user.refreshTokenHash)
+    throw new UnauthorizedException('No refresh token stored');
+
+  const match = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+  if (!match)
+    throw new UnauthorizedException('Invalid refresh token');
+
+  // verify signature
+  try {
+    this.jwtService.verify(refreshToken, {
+      secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+    });
+  } catch {
+    throw new UnauthorizedException('Expired refresh token');
+  }
+
+  const { accessToken, refreshToken: newRefreshToken } =
+    await this.getTokens(user);
+
+  await this.saveRefreshToken(user.id, newRefreshToken);
+
+  return { accessToken, refreshToken: newRefreshToken };
 }
 
 }

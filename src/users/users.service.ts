@@ -67,4 +67,9 @@ async remove(id: number): Promise<void> { // call update remove: remove one with
 async findByEmail(gmail: string): Promise<User | null> { // fallback
   return this.userRepo.findOneBy({ gmail }); // return null if not found
 }
+
+
+async findById(id: number): Promise<User | null> {
+  return this.userRepo.findOne({ where: { id } });
+}
 }           

@@ -11,7 +11,9 @@ export class MeController {
   @Get()
   async getProfile(@Request() req: any): Promise<User> {
     // req.user comes from JwtStrategy.validate()
-    const userId = req.user.userId; // we set this in jwt.strategy.ts
+    console.log('req.user in /me:', req.user);
+    
+    const userId = req.user.userId; 
     return this.userService.findOne(userId);
   }
 }

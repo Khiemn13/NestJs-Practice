@@ -16,13 +16,16 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    const user = await this.authService.validateUser(dto.gmail, dto.password);
+  async login(@Body() body: any) {
+    const gmail = body.gmail?.trim();
+    const password = body.password?.trim();
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials'); // Throw error if no user
-    }
-
-    return this.authService.login(user);
+    return this.authService.login(gmail, password);
   }
+
+  @Post('refresh') // refresh both token, return 2 new token
+  async refresh(@Body() body: any) {
+  const { userId, refreshToken } = body;
+  return this.authService.refreshTokens(userId, refreshToken);
+}
 }

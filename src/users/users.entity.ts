@@ -20,6 +20,8 @@ export class User {
   @Column({ name: 'gmail', unique: true }) // maps to 'gmail' unique value // EMail 
   gmail: string;
 
+  @Column({ nullable: true })
+  refreshTokenHash?: string;
   
   @Exclude() 
   @Column() // maps to 'password' 
