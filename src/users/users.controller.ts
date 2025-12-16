@@ -1,18 +1,23 @@
 // Handles HTTP requests (GET, POST, etc.) and calls users.service.
 
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe  } from '@nestjs/common';
 import { UserService } from './users.service';     
 import { User } from './users.entity';
 import { CreateUserDto } from './dto/user_create.dto';
+import { MoreThanTenPipe } from 'src/pipe/custom.pipe';
 
 
 @Controller('users')  //Sets the base URL path for all routes inside this controller.                                      
 export class UserController {                        
   constructor(private readonly userService: UserService) {} 
 
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe, MoreThanTenPipe) id: number) {
+    return this.userService.findOne(id);
+  }
 
   @Get() // GET /users
-  findAll(): Promise<User[]> { // run findall function 
+  async findAll(): Promise<User[]> { // run findall function 
     return this.userService.findAll(); // return the list of the user
   }
 
@@ -37,7 +42,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> { // run remove, @Param: extract id from the URLi, void: empty value return nothing
+  async remove(@Param('id') id: number): Promise<void> { // run remove, @Param: extract id from the URLi, void: empty value return nothing
     return this.userService.remove(+id);
   }
 }

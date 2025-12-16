@@ -12,7 +12,7 @@ export class CreateUserDto {
   dob: string; 
 
   @IsEmail()
-  gmail: string;
+  email: string;
 
   @IsString()
   password: string;

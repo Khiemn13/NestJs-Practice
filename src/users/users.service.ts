@@ -36,6 +36,7 @@ async findOne(id: number): Promise<User> { // call findOne function: fetch one w
   NotFoundException,         // 404
   InternalServerErrorException, // 500
   */
+  console.log('pipe:service');
   return user;
 }
 
@@ -64,8 +65,8 @@ async remove(id: number): Promise<void> { // call update remove: remove one with
   }
 }
 // Method for login
-async findByEmail(gmail: string): Promise<User | null> { // fallback
-  return this.userRepo.findOneBy({ gmail }); // return null if not found
+async findByEmail(email: string): Promise<User | null> { // fallback
+  return this.userRepo.findOneBy({ email }); // return null if not found
 }
 
 

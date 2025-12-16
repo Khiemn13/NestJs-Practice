@@ -17,13 +17,16 @@ export class User {
   @Column({ type: 'date' }) // maps to 'dob' 
   dob: string;
 
-  @Column({ name: 'gmail', unique: true }) // maps to 'gmail' unique value // EMail 
-  gmail: string;
+  @Column({ name: 'email', unique: true }) // maps to 'email' unique value // EMail 
+  email: string;
+  
+  @Exclude() 
 
   @Column({ nullable: true })
   refreshTokenHash?: string;
-  
+
   @Exclude() 
+
   @Column() // maps to 'password' 
   password: string;
 

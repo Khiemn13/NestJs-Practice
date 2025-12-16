@@ -18,7 +18,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,     // Auto-create tables based on entities 
       }),
     UserModule,
-    AuthModule], // from user.module.ts
+    AuthModule], 
 })
 export class AppModule {}
 

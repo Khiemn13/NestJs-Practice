@@ -14,15 +14,15 @@ export class AuthService {
   ) {}
 
   /*
-    1. Validate login credentials (gmail + password)
+    1. Validate login credentials (email + password)
      Returns user WITHOUT password if valid, or null if invalid.
    */
   async validateUser(
-    gmail: string,
+    email: string,
     pass: string,
   ): Promise<Omit<User, 'password'> | null> {
     // Find user by email
-    const user = await this.usersService.findByEmail(gmail);
+    const user = await this.usersService.findByEmail(email);
     if (!user) return null;
 
     // Compare plain password with hashed password
@@ -37,8 +37,8 @@ export class AuthService {
   /*
    2. Generate a JWT token for a user
   */
-  async login(gmail: string, password: string) {
-    const user = await this.usersService.findByEmail(gmail);
+  async login(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
     if (!user) throw new UnauthorizedException();
 
     const passwordMatches = await bcrypt.compare(password, user.password);
@@ -53,7 +53,7 @@ export class AuthService {
       refreshToken,
       user: {
         id: user.id,
-        gmail: user.gmail,
+        email: user.email,
       },
     };
   }
@@ -64,7 +64,7 @@ export class AuthService {
   */
   async register(dto: CreateUserDto) {
   // 1. Check if email already exists
-  const existing = await this.usersService.findByEmail(dto.gmail);
+  const existing = await this.usersService.findByEmail(dto.email);
   if (existing) {
     throw new ConflictException('Email already exists');
   }
@@ -82,7 +82,7 @@ export class AuthService {
   private async getTokens(user: User) {
     const payload = { // payload here
       sub: user.id,
-      gmail: user.gmail,
+      email: user.email,
     };
 
     // signAsync(payload, options): Build the JWT Token
